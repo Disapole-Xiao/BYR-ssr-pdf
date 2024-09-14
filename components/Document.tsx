@@ -14,15 +14,16 @@ const styles = StyleSheet.create({
   },
 });
 
-// 你需要在这里传入data
-const MyDocument = (props: any) => (
+// 将 data 转化为 pdf
+const MyDocument = ({ data }: any) => (
+  // TODO: 完整样式
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.section}>
-        <Text>Section #1</Text>
+        <Text>id = {data.user.id}</Text>
       </View>
       <View style={styles.section}>
-        <Text>Section #2</Text>
+        <Text></Text>
       </View>
     </Page>
   </Document>

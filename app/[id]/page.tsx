@@ -1,9 +1,10 @@
 "use client";
 
-import Document from "@/components/Document";
-import PDFViewer from "@/components/PDFViewer";
+import Document from "@/components/Document"; // MyDocument
+import PDFViewer from "@/components/PDFViewer"; // Viewer
 import datas from "../data";
 
+// 前端渲染显示 [id] 的信息
 export default function Home({ params }: { params: { id: string } }) {
   const idx = Number(params.id);
   const data = datas[idx];
@@ -11,7 +12,7 @@ export default function Home({ params }: { params: { id: string } }) {
   return (
     <main className="flex h-screen flex-col items-center justify-between p-24">
       <PDFViewer>
-        <Document />
+        <Document data={datas[idx]} />
       </PDFViewer>
     </main>
   );
