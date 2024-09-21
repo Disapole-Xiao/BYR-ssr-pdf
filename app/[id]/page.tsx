@@ -10,7 +10,7 @@ export default function Home({ params }: { params: { id: string } }) {
   const data = datas[idx];
   console.log(data);
   return (
-    <main className="flex h-screen flex-col items-center justify-between p-24">
+    <main className="flex h-screen flex-col items-center justify-between">
       <PDFViewer>
         <Document data={datas[idx]} />
       </PDFViewer>
