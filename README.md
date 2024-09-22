@@ -1,93 +1,18 @@
-2024 BYR 前端考核题实现
-----------------------------------------
-# 基于 SSR 实现 PDF 的渲染与下载
+# 2024 BYRTeam 考核 | 基于 SSR 实现 PDF 的渲染与下载
+使用 React 和 Nextjs 来完成 PDF 的前端渲染以及下载，即[第二课堂](https://dekt.bupt.edu.cn/)成绩单的原型功能
 
-使用 React 和 Nextjs 来完成 PDF 的前端渲染以及下载
+2024 BYR 前端考核题的实现，[这里](https://git.byr.moe/ChocoLZS/ssr-pdf)是原任务仓库
 
-其实就是第二课堂成绩单的原型功能
+## 一些碎碎念
+- 本来也没打算完全复刻的，但是搜资源的时候刚好找到背景原图和使用的字体了，遂复刻之！
+- 虽然没要求加第二课堂的页眉，但是总感觉头上少了点什么，于是强行把图片扣下来加上了（你
+- 计院名字太长，得给你自动计算下字号🤣
+- 下载了自己的第二课堂成绩单发现，当活动名字很长时，字号会缩小并且会换行，但是大小不一的字号个人感觉有点乱，所以只是做了换行
+- 最近在综测，刚好拿综测活动列表过来模拟一下数据🤓
 
-## 如何运行？
-
-首先你需要安装 `nodejs` 推荐版本 [node 20](https://nodejs.org/zh-cn)
-
-然后
-
-```bash
-git clone https://git.byr.moe/ChocoLZS/ssr-pdf.git
-```
-
-```bash
-npm install
-```
-
-```bash
-npm run dev
-```
-
-推荐使用 `vscode` 进行代码编写
-
-## 任务
-
-需要提供如下路由，并完成 pdf 渲染，需要展示 app/data.ts 里的所有数据
-
-前端渲染：
-
-http://localhost:3000/:id
-
-即 http://localhost:3000/1 显示一号的信息
-
-ssr 下载接口：
-
-http://localhost:3000/generate/:id
-
-即 http://localhost:3000/generate/1 提供一号 pdf 的下载，样式应该与前端渲染相同
-
-排版可参考（不需要顶部素材）：![成绩单示例](/docs/report-example.jpg)
-
-## 要求
-
-需要使用 app/data.ts 中的全部数据
-
-需要将 0 1 2 号的 pdf 均提供展示（可以从首页进入）和下载
-
-即 http://localhost:3000/0 http://localhost:3000/1 http://localhost:3000/2 可以正常显示 pdf
-
-http://localhost:3000/generate/0 http://localhost:3000/generate/1 http://localhost:3000/generate/2 可以下载 pdf
-
-![首页](/docs/homepage.png)
-
-## 提示/说明
-
-Document.tsx 应该可以复用，包括浏览器渲染展示和下载
-
-## 相关资料
-
-### React
-
-[React](https://zh-hans.react.dev/)
-
-中文（社区翻译）
-
-前端主流框架之一
-
-### Nextjs
-
-[nextjs 框架](https://nextjs.org/docs)
-
-英文
-
-React 框架，熟悉需要花一定的时间成本，但本仓库基本上搭建好了大致的框架，只需要实现功能即可
-
-### React-pdf
-
-[react-pdf](https://react-pdf.org/)
-
-英文
-
-封装为 React 组件的 pdf 库，用于浏览器渲染与文件生成
-
-### 其它
-
-除此之外你需要学会基本的 git 操作，如 git clone，git add ., git commit, git push
-
-需要一点基本的 js 编程知识
+## 踩坑记录
+1. 先吐槽一下 @react-pdf/renderer 的组件和支持的 CSS 样式都有限，只能手搓列表和表格了啊啊啊啊...参考了一些 @react-pdf/renderer 仓库的 Issues 回答
+2.  @react-pdf/renderer 中文支持不友好，文字无法自动换行，最后找到一个[邪门歪道](https://juejin.cn/post/7101581383545552910#heading-16)解决
+3. 貌似 Next.js 和 @react-pdf/renderer 一起使用会出现静态资源引用的问题。\
+   如果按照 [Next.js 文档](https://juejin.cn/post/7101581383545552910#heading-16) 的方法引入，会导致预览页面有效但是下载时提示找不到资源。\
+   试了 Issue 里面提供的几个方法也没有效果，最后姑且通过加上服务器 url 解决，如 `https://localhost:3000/fonts/font-name.ttf`
