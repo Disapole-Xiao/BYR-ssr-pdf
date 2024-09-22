@@ -1,5 +1,5 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Font } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Font, Image } from '@react-pdf/renderer';
 
 const BASE_URL = 'http://localhost:3000';
 
@@ -13,7 +13,6 @@ Font.register({
   family: 'STKaiti',
   fonts: [
     { src: `${BASE_URL}/fonts/STKaitiRegular.ttf`, fontWeight: 'normal' },
-    { src: `${BASE_URL}/fonts/STKaitiBold.ttf`, fontWeight: 'semibold' },
     { src: `${BASE_URL}/fonts/STKaitiBlack.ttf`, fontWeight: 'bold' },
   ],
 });
@@ -28,18 +27,34 @@ const SEC_TYPE_WIDTH = '15%';
 const SEC_PROP_WIDTH = '20%';
 const SEC_NAME_WIDTH = '65%';
 
+/** 全局样式*/
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 35,
-    paddingBottom: 65,
+    paddingTop: 75,
+    paddingBottom: 60,
     paddingHorizontal: 60,
     fontFamily: 'STKaiti',
+  },
+  pageHeader: {
+    position: 'absolute',
+    top: 15,
+    left: 15,
+    right: 15,
+  },
+
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.4,
+    zIndex: -1,
   },
   h1: {
     fontFamily: 'STBaoLi',
     fontSize: FontSize.XL,
     textAlign: 'center',
-    marginTop: 10,
     marginBottom: 30,
   },
   info: {
@@ -54,7 +69,7 @@ const styles = StyleSheet.create({
   infoCell: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     marginRight: 20,
   },
   title: {
@@ -63,8 +78,17 @@ const styles = StyleSheet.create({
   section: {
     marginVertical: 10,
   },
+  pageNumber: {
+    position: 'absolute',
+    fontSize: FontSize.S,
+    bottom: 30,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+  },
 });
 
+/** Table 样式 */
 const tstyles = StyleSheet.create({
   table: {
     display: 'flex',
@@ -96,6 +120,7 @@ const tstyles = StyleSheet.create({
   },
 });
 
+/** Section 样式 */
 const sstyles = StyleSheet.create({
   semester: {
     fontWeight: 'bold',
@@ -129,7 +154,7 @@ const sstyles = StyleSheet.create({
   },
 });
 
-// 将 data 转化为 pdf
+/** 将 data 转化为 pdf */
 function MyDocument({ data }: { data: { user: any; overall: any[]; semesters: any } }) {
   const info = (
     <View style={styles.info}>
@@ -152,7 +177,7 @@ function MyDocument({ data }: { data: { user: any; overall: any[]; semesters: an
     </View>
   );
   const secsHeader = (
-    <View style={[sstyles.row, { fontSize: FontSize.M }]}>
+    <View style={[sstyles.row, { fontSize: FontSize.L }]}>
       <View style={[sstyles.cell, { width: SEC_NAME_WIDTH, textAlign: 'center' }]}>
         <Title>活动名称</Title>
       </View>
@@ -165,28 +190,50 @@ function MyDocument({ data }: { data: { user: any; overall: any[]; semesters: an
     </View>
   );
   const sections = data.semesters.map((item: any) => (
-    <Section key={item.semester} data={item} style={styles.section} />
+    <Section key={item.semester} data={item} style={styles.section} wrap={false} />
   ));
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        <Image src={`${BASE_URL}/page-header.png`} style={styles.pageHeader} fixed />
+        <Image
+          src={`${BASE_URL}/background-xiaoxun.png`}
+          style={styles.background}
+          fixed
+        />
+
         <Text style={styles.h1}>第二课堂成绩单</Text>
         {info}
         <Table data={data.overall} />
-        <View style={sstyles.container}>
+
+        <View style={sstyles.container} fixed>
           {secsHeader}
           {secsHeader}
         </View>
+
         {sections}
+
+        <Text
+          style={styles.pageNumber}
+          render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`}
+          fixed
+        />
       </Page>
     </Document>
   );
 }
 
+/**
+ * 用于小标题的 Text 组件
+ */
 function Title({ children }: any) {
   return <Text style={styles.title}>{children}</Text>;
 }
+
+/**
+ * 当文字长度超过宽度后会缩小字号的 Text 组件
+ */
 function DText({ children, ...prop }: { children: string; [key: string]: any }) {
   let fontSize: number = prop.style?.fontSize || FontSize.S,
     maxWidth: number = prop.maxWidth || prop.style?.maxWidth || prop.style?.maxWidth;
@@ -196,6 +243,11 @@ function DText({ children, ...prop }: { children: string; [key: string]: any }) 
   return <Text {...prop}>{children}</Text>;
 }
 
+/**
+ * 中文能自动换行的Text组件
+ *
+ * 原理：给所有字符中间插入空格，使得可以换行，再缩小 letterSpacing
+ */
 function BText({
   children,
   fontSize,
@@ -225,6 +277,10 @@ function BText({
     </Text>
   );
 }
+
+/**
+ * 参与活动表格的组件
+ */
 function Table({ data }: { data: { category: string; count: number }[] }) {
   return (
     <View style={tstyles.table}>
@@ -303,6 +359,10 @@ function Table({ data }: { data: { category: string; count: number }[] }) {
     </View>
   );
 }
+
+/**
+ * 每个学期的标题及活动列表
+ */
 function Section({
   data,
   style,
@@ -327,7 +387,7 @@ function Section({
   }) {
     return (
       <View {...props} style={[sstyles.row, style]}>
-        <View style={[sstyles.cell, { width: SEC_NAME_WIDTH, textAlign: 'left' }]}>
+        <View style={[sstyles.cell, { width: SEC_NAME_WIDTH, textAlign: 'left', paddingRight: 8 }]}>
           <BText>{data.name}</BText>
         </View>
         <View style={[sstyles.cell, { width: SEC_TYPE_WIDTH }]}>
